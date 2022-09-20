@@ -1,0 +1,62 @@
+services:
+  node01:
+    build:
+      context: .
+    hostname: node01
+    networks:
+      hadoop:
+        ipv4_address: 10.0.0.10
+    extra_hosts:
+      - "node01:10.0.0.10"
+      - "node02:10.0.0.11"
+      - "node03:10.0.0.12"
+    stdin_open: true
+    tty: true
+
+    command: ["/bin/bash", "/node01.sh"]
+    #command: bash
+    stop_grace_period: 20s
+
+  node02:
+    build:
+      context: .
+    hostname: node02
+    networks:
+      hadoop:
+        ipv4_address: 10.0.0.11
+    extra_hosts:
+      - "node01:10.0.0.10"
+      - "node02:10.0.0.11"
+      - "node03:10.0.0.12"
+    stdin_open: true
+    tty: true
+
+    command: ["/bin/bash", "/node02.sh"]
+    #command: bash
+    stop_grace_period: 20s
+    depends_on:
+      - node01
+      - node03
+
+  node03:
+    build:
+      context: .
+    hostname: node03
+    networks:
+      hadoop:
+        ipv4_address: 10.0.0.12
+    extra_hosts:
+      - "node01:10.0.0.10"
+      - "node02:10.0.0.11"
+      - "node03:10.0.0.12"
+    stdin_open: true
+    tty: true
+
+    command: ["/bin/bash", "/node03.sh"]
+    #command: bash
+    stop_grace_period: 20s
+
+networks:
+  hadoop:
+    name: hadoop
+    external: true

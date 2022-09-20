@@ -1,0 +1,26 @@
+FROM hadoop-base:latest
+
+WORKDIR /root
+
+USER root:root
+
+ARG ZOOKEEPER_VERSION=3.7.1
+
+RUN set -eu; \
+	apt-get update -y; apt-get upgrade -y; \
+	apt-get install wget -y; \
+	wget -nv https://dlcdn.apache.org/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz;\
+	tar -zxf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz --no-same-permissions --no-same-owner; \
+	mv apache-zookeeper-${ZOOKEEPER_VERSION}-bin /opt/zookeeper; \
+	rm apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
+	echo 'export HDFS_ZKFC_USER=root' >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh; \
+	echo 'export HDFS_JOURNALNODE_USER=root' >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh; \
+	apt-get remove wget -y; \
+	apt-get autoremove -y; \
+	apt-get clean; \
+	echo '*removing apt cache lists*'; \
+	rm -rf /var/lib/apt/lists/*; \
+	echo '*done*';
+
+ENV ZOOKEEPER_HOME=/opt/zookeeper
+ENV PATH=$ZOOKEEPER_HOME/bin:$PATH
